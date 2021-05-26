@@ -6,7 +6,7 @@
 - nodeName：节点的名称。
 - nodeType：节点的类型（元素、属性、文本、注释、整个文档）。
 
-![](C:\Users\akash\Desktop\ct_htmltree.gif)
+![](https://img2018.cnblogs.com/i-beta/1226410/201912/1226410-20191231100910404-878474224.png)
 
 ## 添加节点
 
