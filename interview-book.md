@@ -376,18 +376,22 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 ### TCP滑动窗口
 
-解决发送方和接收方收发数据速率不一致的问题。滑动窗口相当于接收方的缓存，接收方向发送方通知自己可接受数据的大小，而发送方会根据这个数值发送数据。
+发送方的发送缓存内的数据都可以被分为4类:
 
-发送窗口
+- 已发送，已收到ACK
+- 已发送，未收到ACK
+- 未发送，但允许发送
+- 未发送，但不允许发送
 
-- 已经发送并且对端确认（Sent/ACKed）---------------发送窗外 缓冲区外
-- 已经发送但未收到确认数据（Sent/UnACKed）----- --发送窗内 缓冲区内
-- 允许发送但尚未防的数据（Unsent/Inside）-----------发送窗内 缓冲区内
-- 未发送暂不允许（Unsent/Outside）-------------------发送窗外 缓冲区内
+其中类型2和3都属于发送窗口。
 
-接收窗口
+接收方的缓存数据分为3类：
 
-“已接收”，“未接收准备接收”，“未接收并未准备接收”。其中“未接收准备接收”称之为接收窗口。
+- 已接收
+- 未接收但准备接收
+- 未接收而且不准备接收
+
+其中类型2属于接收窗口。
 
 ### 与UDP的区别
 
@@ -396,3 +400,928 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 - UDP可以一对一或者一对多。
 - UDP首部只有8字节。
 - UDP用于高速传输和对实时性有较高要求的通信（视频、音频等多媒体通信）或广播通信。
+
+## 网络模型
+
+![image-20210527103115023](C:\Users\akash\AppData\Roaming\Typora\typora-user-images\image-20210527103115023.png)
+
+# CSS相关
+
+## link和@import的区别
+
+- link是html提供的标签，@import是CSS提供的。
+- link没有兼容性问题，而@import有。
+- link加载与页面加载同时进行，而@import要等页面加载完后加载。
+- link权重高于@import。
+
+## flex布局
+
+弹性布局，设置该布局会导致子元素的float、clear和vertical-align失效。
+
+| 属性            | 作用                                                         |
+| --------------- | ------------------------------------------------------------ |
+| flex-direction  | 决定主轴方向，即项目的排列方向                               |
+| flex-wrap       | 决定是否换行                                                 |
+| justify-content | 决定项目在主轴上的对齐方式                                   |
+| align-items     | 决定项目在交叉轴上的对齐方式                                 |
+| flex-grow       | 定义项目的放大比例，默认为0                                  |
+| flex-shrink     | 定义项目的缩小比例，默认为1                                  |
+| flex-basis      | 定义在分配多余空间前，项目占据的主轴空间                     |
+| flex            | flex-grow,flex-shrink和flex-basis的简写，默认值为0 1 auto,flex:1的意思是flex:1 1 任意数字+任意长度单位 |
+
+## 三栏布局
+
+- flex布局实现
+
+```
+<body>
+  <div class="box">
+    <div class="left">left</div>
+    <div class="center">center</div>
+    <div class="right">right</div>
+  </div>
+</body>
+
+<style>
+  .box {
+    display: flex;
+  }
+
+  .left {
+    background-color: green;
+    width: 100px;
+  }
+
+  .center {
+    flex: 1;
+    background-color: yellow;
+  }
+
+  .right {
+    background-color: red;
+    width: 100px;
+  }
+</style>
+```
+
+- float布局实现
+
+```
+<body>
+  <div class="box">
+    <div class="left">left</div>
+    <div class="right">right</div>
+    <div class="center">center</div>
+  </div>
+</body>
+
+<style>
+  .left {
+    float: left;
+    background-color: green;
+    width: 100px;
+  }
+
+  .center {
+    margin-left: 100px;
+    margin-right: 100px;
+    background-color: yellow;
+  }
+
+  .right {
+    float: right;
+    background-color: red;
+    width: 100px;
+  }
+</style>
+```
+
+- 绝对定位实现
+
+```
+<body>
+  <div class="box">
+    <div class="left">left</div>
+    <div class="center">center</div>
+    <div class="right">right</div>
+  </div>
+</body>
+
+<style>
+  .left {
+    position: absolute;
+    left: 0;
+    background-color: green;
+    width: 100px;
+  }
+
+  .center {
+    position: absolute;
+    left: 100px;
+    right: 100px;
+    background-color: yellow;
+  }
+
+  .right {
+    position: absolute;
+    right: 0;
+    background-color: red;
+    width: 100px;
+  }
+</style>
+```
+
+## 两列等高布局
+
+- margin和padding正负抵消
+
+```
+<body>
+  <div class="box">
+    <div class="left"></div>
+    <div class="right"></div>
+  </div>
+</body>
+
+<style>
+  .box {
+    overflow: hidden;
+  }
+
+  .left {
+    width: 100px;
+    height: 200px;
+    float: left;
+    background: #149BDF;
+    padding-bottom: 5000px;
+    margin-bottom: -5000px;
+  }
+
+  .right {
+    width: 200px;
+    height: 400px;
+    margin-left: 150px;
+    background: #32CD32;
+  }
+</style>
+```
+
+- flex布局实现
+
+```
+<body>
+  <div class="box">
+    <div class="left"></div>
+    <div class="right"></div>
+  </div>
+</body>
+
+<style>
+  .box {
+    display: flex;
+  }
+
+  .left {
+    width: 100px;
+    height: 200px;
+    background: #149BDF;
+  }
+
+  .right {
+    width: 200px;
+    background: #32CD32;
+  }
+```
+
+- border实现
+
+```
+<body>  <div class="box">    <div class="left"></div>    <div class="right"></div>  </div></body><style>  .box {    border-left: 100px solid #149BDF;  }  .left {    width: 100px;    height: 200px;    float: left;    margin-left: -100px;  }  .right {    width: 200px;    height: 400px;    margin-left: 150px;    background: #32CD32;  }</style>
+```
+
+## 盒模型
+
+`box-sizing`：`content-box`/`border-box`。
+
+`content-box`：标准盒模型，盒子宽度 = width + padding + border。
+
+`border-box`：怪异盒模型，盒子宽度 = width。
+
+## position的值
+
+| 属性     | 作用                                                         |
+| -------- | ------------------------------------------------------------ |
+| fixed    | 元素位置相对于浏览器窗口是固定的，即使窗口滚动也不会移动。fixed定位使元素脱离文档流，因此不占据空间。fixed定位元素会和其他元素重叠。 |
+| absolute | 元素位置相对于最近的已定位父元素，若没有则相对于html。absolute定位使元素位置脱离文档流，因此不占据空间。absolute定位元素和其他元素重叠。 |
+| relative | 相对定位的元素将出现在它所在的位置上，然后可通过top、bottom、right、left让这个元素相对于它的初始位置移动。使用相对定位时无论元素是否移动仍占据原来空间，因此，移动元素会导致它覆盖其他框。 |
+| static   | 默认值，没有定位。元素出现在正常的流中（忽略top、bottom、right、left、z-index声明） |
+| inherit  | 继承父元素的position属性值                                   |
+| sticky   | 元素先按普通文档流进行定位，而后，元素定位表现为在跨越特定值前为相对定位，之后为固定定位。 |
+
+## 隐藏元素的方法
+
+- `display:none`：相当于删除元素，布局改变，不可以触发事件。
+- `opacity:0`：元素隐藏，页面布局不变，可以触发事件。
+- `visibility:hidden`：元素隐藏，页面布局不变，不可以触发事件。
+
+## 伪类和伪元素
+
+伪类用于当前元素某个状态时为其添加样式，比如`:hover`、`:visited`。
+
+伪元素是创建不在文档树中的元素，并为其添加样式，比如`::before`。
+
+## BFC
+
+块级格式化上下文，独立容器，不会影响到外面的元素。
+
+触发：
+
+- float除none以外的值
+- position是absolute和fixed
+- display是flex/inline-block/table-cell/inline-flex/table-caption
+- overflow除了visible以外的值
+
+特性（作用）：
+
+- 内部的Box会在垂直方向上一个接一个的放置。
+- 垂直方向上的距离由margin决定。
+- BFC的区域不会与float的元素区域重叠。
+- 计算BFC的高度时，浮动元素也参与计算。
+
+*margin塌陷：父子元素设置margin-top时选择大的，如果子元素的margin-top大于父元素的，两个就会一起往下跑。BFC解决。
+
+## 水平垂直居中
+
+- flex实现
+
+```
+<body>
+  <div class="box">
+    <div class="content">content</div>
+  </div>
+</body>
+
+<style>
+  .box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+    background-color: green;
+  }
+
+  .content {
+    width: 50px;
+    height: 50px;
+    background-color: red;
+  }
+</style>
+```
+
+- `margin:auto`实现
+
+```
+<body>
+  <div class="box">
+    <div class="content">content</div>
+  </div>
+</body>
+
+<style>
+  .box {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    background-color: green;
+  }
+
+  .content {
+    position: absolute;
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 50px;
+    height: 50px;
+    background-color: red;
+  }
+```
+
+- 负margin法
+
+```
+<body>
+  <div class="box">
+    <div class="content">content</div>
+  </div>
+</body>
+
+<style>
+  .box {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    background-color: green;
+  }
+
+  .content {
+    position: absolute;
+    margin: auto;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+    margin-top: -25px;
+    margin-left: -25px;
+    background-color: red;
+  }
+</style>
+```
+
+## CSS3新增内容
+
+- CSS3边框：`border-radius`、`box-shadow`、`border-image`
+- CSS3背景：`background-size`、`background-origin`（规定背景图片定位区域）
+- CSS3文字效果：`text-shadow`、`word-wrap`（对长单词进行拆分并换行）
+- CSS3 2D转换：`transform: translate()/rotate()/scale()`
+- CSS3 3D转换：`transform: rotateX()/rotateY()`
+- CSS3 过渡：`transition`
+- CSS3 动画：`animation`
+- CSS3用户界面：`resize`（是否可由用户调整元素尺寸）、`box-sizing`（定义盒模型）
+
+## PX、REM和EM的区别
+
+- `px`是固定像素，无法因为页面大小而改变；
+
+- `em`,`rem`比`px`灵活，是相对长度单位，更适用于响应式布局；
+
+- `em`相对于父元素，`rem`相对于根元素。
+
+## 选择器优先级
+
+!important > 行内选择器 > id选择器 > class选择器 > 标签选择器
+
+## CSS实现三角形
+
+```
+	margin-top: 100px;
+    width: 0;
+    height: 0;
+    /*底边*/
+    border-top: 100px solid red;
+    /*斜边*/
+    border-left: 100px solid transparent;
+```
+
+# JS相关
+
+## 数组常用方法
+
+| push    | 在末尾插入元素，返回数组长度，修改原数组                     |
+| ------- | ------------------------------------------------------------ |
+| pop     | 删除末尾元素，返回被删除的元素，修改原数组                   |
+| shift   | 删除头部元素，返回被删除的元素，修改原数组                   |
+| unshift | 在头部插入元素，返回数组长度，修改原数组                     |
+| map     | 每个元素都会调用提供的函数，返回新数组，不会更改原数组       |
+| forEach | 每个元素都会调用提供的函数，没有返回值，修改原数组           |
+| reduce  | 让数组前项和后项做计算，返回值为最后结果                     |
+| sort    | 排序，返回新数组，原数组改变                                 |
+| filter  | 对所有的元素进行判断，满足条件的元素组成新数组返回，不改变原数组 |
+| concat  | 合并数组或元素，返回新的数组                                 |
+| splice  | 添加删除或替换元素，返回删除或替换的值，改变原数组           |
+| slice   | 截取复制数组指定内容，返回新数组                             |
+| join    | 指定字符连接字符串                                           |
+
+## 闭包
+
+可以访问其它函数内部变量的函数。
+
+作用：
+
+- 在函数外部访问函数内部的变量.
+
+- 让变量保存在内存中，不会随着函数的结束而销毁。
+
+缺点：会增大内存使用量，使用不当会造成内存泄漏。
+
+*内存泄漏：已分配的内存未释放或者无法释放。比如：闭包和未清理的定时器。
+
+## 垃圾回收
+
+`js`垃圾回收器监视所有的对象，会把不可访问的对象删除。所谓的可访问就是可以从根访问到该值。
+
+- 标记清除：垃圾回收器获取根并标记它们，然后标记它们的引用以及子孙代的引用，没有被标记的就被删除。
+
+- 引用计数：记录每个对象被引用的次数，计数器为0就直接回收内存。
+
+## Promise相关
+
+构造函数接收一个函数，这个函数有两个参数`resolve`和`reject`，它们都是函数，异步操作成功就调用`resolve`，出错就调用`reject`。
+
+Promise A+规则：
+
+- 三种状态：`pending`、`resolved`、`rejected`，只能从`pending`到`resolved`或者`pending`到`rejected`，并且不能再转变为其他状态。
+
+- `resolve`必须有一个`value`值，reject必须有一个`reason`值，两个值都不能改变。
+
+- 必须提供`.then`方法来获取`value`或`reason`，并且返回一个`promise`。
+
+- `.then`接收两个参数，一个是`onFulFilled`，它在是`resolved`状态后调用，一个是`onRejected`，它在`rejected`状态后调用。
+
+`Promise.all`：接收数组参数，等所有异步操作执行成功了才执行回调或者有一个失败了就执行回调。
+
+`Promise.race`：谁先执行完成谁就先执行回调，其余的将不会再进入race的回调。
+
+代码实现：
+
+```
+  function mypromise(constructor) {
+    self = this;
+    self.value;
+    self.err;
+    self.status = 'pending';
+    function reslove(value) {
+      if (self.status === 'pending') {
+        self.status = 'resolved';
+        self.value = value;
+      }
+    }
+    function reject(err) {
+      if (self.status === 'pending') {
+        self.status = 'rejected';
+        self.err = err;
+      }
+    }
+    try {
+      constructor(reslove, reject);
+    }
+    catch (e) {
+      reject(e);
+    }
+  }
+  mypromise.prototype.then = function (onFullfilled, onRejected) {
+    let self = this;
+    switch (self.status) {
+      case "resolved":
+        onFullfilled(self.value);
+        break;
+      case "rejected":
+        onRejected(self.err);
+        break;
+      default:
+    }
+  }
+```
+
+```
+  function promiseAll(list) {
+    var finishedVal = new Array(list.length);
+    var count = 0;
+    return new Promise((resolve, reject) => {
+      for (var i = 0; i < list.length; i++) {
+        //不是promise对象,就用promise.resolve转成promise对象
+        Promise.resolve(list[i].then((val) => {
+          finishedVal[i] = val;
+          count++;
+          if (count === list.length) {
+            return resolve(finishedVal);
+          }
+        }, function (err) {
+          return reject(err);
+        }))
+      }
+    })
+  }
+```
+
+```
+function promiseRace(list) {
+    return new Promise((resolve, reject) => {
+      for (var i = 0; i < list.length; i++) {
+        Promise.resolve(list[i].then((val) => {
+          return resolve(val);
+        }, function (err) {
+          return reject(err);
+        }))
+      }
+    })
+  }
+```
+
+## let、var和const的区别
+
+| 类型  | 变量提升 | 暂时性死区（声明变量之前变量不可用） | 重复声明 | 初始值 | 作用域                 |
+| ----- | -------- | ------------------------------------ | -------- | ------ | ---------------------- |
+| var   | 存在     | 不存在                               | 允许     | 不需要 | 全局作用域、函数作用域 |
+| let   | 不存在   | 存在                                 | 不允许   | 不需要 | 块级作用域             |
+| const | 不存在   | 存在                                 | 不允许   | 需要   | 块级作用域             |
+
+## 变量提升
+
+作用域链：函数使用到的变量在当前作用域没有找到值，就会向创建这个函数的作用域里去查，直到查到全局作用域。
+
+变量提升：变量声明提到函数最顶端，但是赋值不会提升。函数声明在变量声明后面。
+
+## 事件循环
+
+`js`先执行宏任务，再执行全部的微任务，然后继续新的宏任务。
+
+- 宏任务：`script`(整体代码), `setTimeout`, `setInterval`, `setImmediate`, `I/O`, `UI rendering`。
+
+- 微任务：`process.nextTick`, `Promises`, `Object.observe`等。
+
+## 原型链
+
+![image-20210527162029450](C:\Users\akash\AppData\Roaming\Typora\typora-user-images\image-20210527162029450.png)
+
+## 继承
+
+- 原型链继承：父类实例作为子类原型
+
+  特点：基于原型链，既是父类的实例，又是子类的实例。
+  缺点：无法实现多继承，无法向父类构造参数传参。
+
+```
+function Parent() {
+  this.name = 'parent';
+}
+function Child() {
+  this.type = 'child';
+}
+Child.prototype = new Parent();
+```
+
+- 构造继承：使用父类构造函数增强子类实例
+
+  特点：可以实现多继承。
+  缺点：只能继承父类的实例属性和方法，不能继承原型上的属性和方法。
+
+```
+function Parent() {
+  this.name = 'parent';
+}
+function Child() {
+  Parent1.call(this);
+  this.type = 'child';
+}
+```
+
+- 组合继承：构造继承+原型链继承
+
+  特点：可以继承实例属性和方法，也可以继承原型属性和方法。
+  缺点：调用两次父类构造函数，会生成两份实例。
+
+```
+function Parent() {
+  this.name = 'parent';
+}
+function Child() {
+  Parent.call(this);
+  this.type = 'child';
+}
+Child.prototype = new Parent();
+```
+
+## new的过程
+
+1. 创建空对象；
+2. 将对象的原型指向构造函数的原型；
+3. 将this指向新对象；
+4. 返回这个对象。
+
+```
+function myNew(fn) {
+	var obj = new Object();
+	obj._proto_ = fn.prototype;
+	var result = fn.apply(obj);
+	return result instanceof Object ? result : Obj;
+}
+```
+
+## 箭头函数
+
+- 箭头函数不能作为构造函数。
+- 箭头函数没有自己的this，从作用域链上继承。
+- 箭头函数没有自己的arguments，会从外部函数上继承。
+- 箭头函数没有原型。
+
+## 防抖节流
+
+- 防抖：事件触发n秒后再调用函数，如果n秒内再次触发事件，就重新计时。（搜索框搜索输入）
+
+```
+function debounce(fn, delay) {
+    var timer;
+    return function () {
+      var self = this;
+      var args = arguments;
+      if (timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(function () {
+        fn.apply(self, args);
+      }, delay);
+    };
+  }
+```
+
+节流：每隔n秒就执行一次函数，中途触发不会执行函数。（滚动加载）
+
+```
+function throttle(fn, delay) {
+    var timer;
+    return function () {
+      var self = this;
+      var args = arguments;
+      if (timer) {
+        return;
+      }
+      timer = setTimeout(function () {
+        fn.apply(self, args);
+        timer = null;
+      }, delay);
+    };
+  }
+```
+
+## bind、call和apply的区别
+
+都可以用来改变this指向。
+
+- call有多个参数，第一个参数是this要指向的对象，以后的参数是数组里的元素。
+
+- apply有两个参数，第一个参数是this要指向的对象，第二个参数为数组。
+
+- bind会返回一个新的函数，还需要调用一次。
+
+```
+  Function.prototype.bind2 = function (context) {
+    var self = this;
+    var args = Array.prototype.slice.call(arguments, 1);
+    var fNOP = function () { };
+    var fBound = function () {
+      var bindArgs = Array.prototype.slice.call(arguments);
+      return self.apply(this instanceof fNOP ? this : context, args.concat(bindArgs));
+    }
+    fNOP.prototype = this.prototype;
+    fBound.prototype = new fNOP();
+    return fBound;
+  }
+```
+
+## this的指向
+
+始终指向调用它的对象。
+
+- 默认绑定：指向全局对象。
+
+- 隐式绑定：调用的对象。
+
+- 显示绑定：call、apply、bind方法改变指向。
+
+- New绑定：指向新创建的对象。
+
+## 数据类型
+
+- 基本数据类型：string、number、boolean、null、undefined和symbol。
+- 引用类型：object、array和function。
+
+区别：
+
+- 基本数据类型存放在栈中，引用类型存放在堆中。
+
+- 基本数据类型比较的是原始值，引用类型比较的是地址。
+
+## ==和===
+
+[] == ![]返回true：[] == false ----> [] == 0 ----> '' == 0 ----> 0 == 0 ----> true；
+
+{} == !{}返回false：{} == false ----> {} == 0 ----> NaN == 0 ----> false；
+
+null == undefined返回true；
+
+![image-20210527171000400](C:\Users\akash\AppData\Roaming\Typora\typora-user-images\image-20210527171000400.png)
+
+`ToPrimitive(X)`即使用`valueOf`返回原始值，或者使用`toString`。
+
+## 数组类型判断
+
+- `Array.isArray()`方法。
+- `InstanceOf Array`方法。
+
+```
+ function myInstanceOf(target1, target2) {
+    // let proto = Object.getPrototypeOf(target1);
+    // if (proto === target2.prototype) {
+    //   return true;
+    // } else if (!proto) {
+    //   return false;
+    // } else {
+    //   return myInstanceOf(proto, target2)
+    // }
+    return target2.prototype.isPrototypeOf(target1);
+  }
+```
+
+- `constructor`属性（可以被改写，不合适）。
+
+- `Object.prototype.toString.call()`方法。
+
+## DOM0事件和DOM2事件
+
+- DOM0级：在元素上绑定事件，解绑时设置NULL。
+
+- DOM2级：通过事件监听的形式绑定，元素可以有多个事件处理函数，`addEventListener()`和`removeEventListener()`。有三个过程：事件捕获阶段、处于目标阶段、事件冒泡阶段。
+
+*先冒泡后捕获：监听到捕获事件就推迟执行。
+
+## 模块化
+
+- CommonJS：一个模块就是一个脚本文件，对外接口是exports属性，require属性第一次加载会执行脚本，然后会在内存中生成一个对象，想要再次运行模块必须清理缓存。
+
+- ES Modules：由export和import组成。CommonJS 模块就是对象，输入时必须查找对象属性。而 ES Modules 不是对象，而是通过 export 命令显式指定输出的代码。
+
+- AMD：异步方式加载模块，不影响他后面语句的运行，所有依赖这个模块的语句，都定义在一个回调函数中，等到加载完成之后，这个回调函数才会运行。用define定义，require引用。
+
+## 深浅拷贝
+
+如果B复制了A，当修改A时，看B是否会发生变化，如果B也跟着变了，说明这是浅拷贝，如果B没变，那就是深拷贝。浅拷贝是拷贝一层，深层次的对象级别的就拷贝引用；深拷贝是拷贝多层，每一级别的数据都会拷贝出来。
+
+```
+function deepClone(target) {
+	let result
+	if (typeof target === 'object') {
+		if (Array.isArray(target)) {
+			result = []
+			for (let i in target) {
+				result.push(deepClone(target[i]))
+			}
+		} else if (target === null) {
+			result = target
+		} else if (target.constructor === RegExp) {
+			result = target
+		} else if (target.constructor === Date) {
+			result = target
+		} else {
+			result = {}
+			for (let i in target) {
+				result[i] = deepClone(targer[i])
+			}
+		}
+	} else if (typeof target === 'function') {
+		// 如果是函数
+		result = new Function('return '+ target.toString())
+	} else {
+		// 如果是基本数据类型，如number、string、boolean、undefined
+		result = target
+	}
+	return result
+}
+```
+
+## ES6新特性
+
+- `let`、`const`声明变量，实现块级作用域。
+
+- 引入`promise`、`async/await`解决异步问题。
+
+- 新的数据类型`symbol`，新的数据结构`map`和`set`。
+
+- 引入`class`。
+
+## 解决JS加载过程阻塞问题
+
+- `defer`：遇到带有`defer`属性的script标签时，浏览器会再开启一个线程去下载`js`文件，同时继续解析HTML文档，等HTML全部解析完毕DOM加载完成后，再去执行加载好的`js`文件。
+
+- `asyn`c：会在下载完毕后立刻执行。对于多个带有`async`的`js`文件，不保证按顺序执行，哪个`js`文件先下载完就先执行哪个。
+
+## JS单线程的原因
+
+`js`作为浏览器脚本语言，主要用途是与用户互动，以及操作DOM，这决定了它只能是单线程，否则会带来很复杂的同步问题。比如若`js`同时拥有两个线程，一个线程在某个DOM节点上添加内容，另一个线程删除这个节点，那浏览器将不知所措。
+
+## 事件委托/事件代理
+
+不在发生地设置监听函数而是在父元素上设置监听函数，通过事件冒泡，父元素可以监听到子元素上事件的触发，从而完成响应。
+
+优点：
+
+- 减少DOM操作，提高性能。
+- 随时可以添加子元素。
+
+## AJAX
+
+创建对象、设置请求函数和回调函数、获取异步对象的`readyState`属性、判断响应报文的状态、读取响应数据。
+
+```
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.open("GET", "/try/ajax/demo_get.php", true);
+  xmlhttp.send();
+  xmlhttp.onreadystatechange = function () {
+    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+      document.getElementById("mydiv").innerHTML = xmlhttp.responseText;
+    }
+  }
+```
+
+```
+function promiseAjax() {
+    return new Promise((resolve,reject) => {
+      var xmlhttp = new XMLHttpRequest();
+      xmlhttp.open("GET", "/try/ajax/demo_get.php", true);
+      xmlhttp.send();
+      xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+          resolve(JSON.parse(xmlhttp.responseText));
+        } else {
+          reject(JSON.parse(xmlhttp.responseText));
+        }
+      }
+    })
+  }
+```
+
+# VUE相关（结合项目）
+
+## 生命周期
+
+1. VUE实例创建--->`beforeCreate`：做了一些初始化操作，此时组件还没有被挂载，data、methods等也没有绑定。
+2. `beforeCreate`--->`created`：完成了数据的绑定、计算属性和方法的挂载等，此时组件还没有挂载，但可以操作data和methods等。
+3. `created`--->`beforeMount`：完成了页面模板的解析，页面存在内存中，还没有被渲染。
+4. `beforeMount`-->`mounted`： 执行页面从内存中渲染到DOM的操作，渲染页面模板的优先级是render函数>template属性>外部html。
+5. `mounted`-->`beforeUpdate`：数据更新时调用，此时，VUE实例中的数据是最新的，但页面上还是旧的数据。
+6. `beforeUpdate`-->`updated`：DOM渲染完成后调用，此时组件的DOM已经更新，可以执行依赖于DOM的操作。
+7. `updated`-->`beforeDestory`：实例销毁前调用，实例任然可以用。
+8. `beforeDestory`-->`destoryed`：实例销毁后调用，所有东西都不可用。
+
+## 双向绑定
+
+采用数据劫持的方式实现双向数据绑定，最核心的方法是通过`Object.defineProperty()`实现，它可以对数据添加属性描述符getter与setter实现劫持。
+
+首先要对数据进行劫持监听，所以我们需要设置一个监听器`Observer`，用来监听所有属性。如果属性发生变化了，就需要告诉订阅者`Watcher`看是否需要更新。因为订阅者是有很多个，所以我们需要有一个消息订阅器`Dep`来专门收集这些订阅者，然后在监听器`Observer`和订阅者`Watcher`之间进行统一管理的。接着，我们还需要有一个指令解析器`Compile`，对每个节点元素进行扫描和解析，将相关指令对应初始化成一个订阅者`Watcher`，并替换模板数据或者绑定相应的函数，此时当订阅者`Watcher`接收到相应属性的变化，就会执行对应的更新函数，从而更新视图。
+
+## computed和watch的区别
+
+- computed：计算属性，可以根据所依赖数据动态显示新的计算结果，它可以进行缓存，如果所依赖的数据没有发生改变就不会再次执行函数。getter函数和setter函数。每个computed属性都会用watcher包装，计算watcher里的dirty为false时直接返回value，否则重新计算。
+
+- watch：里面的immediate属性可以控制在watch中首次绑定的时候是否执行方法，deep属性可以让watch监听到对象内部属性的改变。
+
+## 组件通信
+
+- 父-->子：props
+
+- 子->父：$emit，需要通过事件的触发。
+
+- 父子：$children和$parent
+
+- $ref：$refs适用于父子组件通信，ref被用来给元素或子组件注册引用信息，引用信息将会注册在父组件的$refs对象上，如果在普通的DOM元素上使用，引用指向的就是DOM元素，如果用在子组件上，引用就指向组件实例。要注意的是因为ref本身是作为渲染结果被创建的，在初始渲染的时候是不能访问它们的，此时它们还不存在，另外$refs也不是响应式的，因此也不应该试图用它在模板中做数据绑定。
+
+- VUEX
+
+## MVVM
+
+`Model`、`ViewModel`和`View`，当`model`更新时，`ViewModel`会通过数据绑定更新到`View`；在`View`触发指令时，会通过`ViewModel`传递消息到`Model`。实现了`View`和`Model`的自动同步，不需要手动操作DOM元素来改变`View`的显示。
+
+## v-if和v-show的区别
+
+- v-if是条件渲染，动态添加删除DOM元素，只有在表达式为true时渲染，适合条件不太可能改变的情况。
+
+- v-show始终会被渲染并且保留在DOM中，只是简单切换CSS属性，适合条件频繁切换的情况。
+
+## VUEX
+
+实现了单向数据流。
+
+State:状态
+
+Getter:根据state的值计算返回值
+
+Mutation:同步更改state
+
+Action:异步更改state
+
+## vue-router相关
+
+原理：通过改变URL，在不重新请求页面的情况下，更新页面视图，从而动态加载与销毁组件，简单的说就是，虽然地址栏的地址改变了，但是并不是一个全新的页面，而是之前的页面某些部分进行了修改。
+
+路由模式：
+
+- hash模式：#号及后面的字符，不会向服务器端发出请求，所以不会重新加载页面，同时hash改变会触发`hashchange`事件。
+- history模式：必须与后端设置路由相同。
+
+$router和$route的区别：
+
+$route可以访问当前路由的状态信息，而$router是一个实例，管理一组$route。
+
+## diff算法
+
+- virtual DOM 用`js`对象结构表示DOM树结构，然后用这个树构建一个真正的DOM树，插到文档中，当状态变更时，重新构造一颗新的对象树，然后将新的树和旧的树进行比较，记录差异，并把差异以打补丁的方式应用到真正的DOM树上来更新视图。
+
+- <img src="https://images2018.cnblogs.com/blog/998023/201805/998023-20180519212357826-1474719173.png" alt="img" style="zoom:50%;" />
+
+  都有子节点的时候会执行updateChildren函数
+
+  ![img](https://images2018.cnblogs.com/blog/998023/201805/998023-20180519211809225-1140464542.png)
+
+  四种匹配方式，如果都不匹配就会看key值，如果有key值就根据key值操作。（使用key值可以更高效地更新虚拟DOM，index会改变）
