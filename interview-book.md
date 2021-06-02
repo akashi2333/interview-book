@@ -150,6 +150,7 @@ ctx.stroke();
 |  401   |                     需要用户验证                     |
 |  404   |                    请求资源不存在                    |
 |  500   |                    服务器发生错误                    |
+|  502   |   服务器作为网关或代理，从上游服务器收到无效响应。   |
 
 ## HTTP头部
 
@@ -278,12 +279,11 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 ### Cookie、Local Storage和Session Storage的区别
 
 - `cookie`只有4k左右的大小，而`sessionStorage`和`localStorage`有5MB的大小。
-
 - `cookie`在时间过期前都有效，`sessionStorage`窗口关闭之前有效，而`localStorage`永久有效。
-
 - `cookie`和`localSorage`可以同源窗口共享，而`sessionStorage`不行。
-
 - `cookie`在浏览器和服务器之间来回传递，`localStorage`和`sessionStorage`仅在本地保存。
+
+*两个同源页面交互可以使用`localStorage`，不同源的话就两个页面嵌入相同的`iframe`实现交互。
 
 ## XSS攻击
 
@@ -307,17 +307,18 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 ## 跨域
 
-原因：浏览器同源策略：非同源的不能够交互。
+原因：浏览器同源策略：非同源的不能够交互。（协议、域名、端口）
 
 解决方案：
 
 - CORS
   - 简单请求：请求中有`origin`头部，其中包含请求页面的源信息，服务器根据这个头部信息来决定是否响应，如果服务器认为这个请求可以接受就在`Access-Control-Allow-Origin`头部中会发相同的源信息，如果源信息不匹配就驳回请求。
   - 非简单请求：发送真正的请求前会发送一个`Preflight`请求给服务器，该请求使用OPTIONS方法，发送`Origin`、`Access-Control-Request-Method`头部，然后服务器决定是否允许这种类型的请求，通过在响应中发送头部与浏览器沟通，一旦服务器通过`Preflight`请求允许该请求后，浏览器就可以正常的CORS请求了。
-
+  - 当Access-Control-Allow-Credentials的值为true时可以携带cookie。
+  
 - JSONP
   - `js`不受浏览器同源策略的影响，可以通过`script`标签进行跨域请求。
-  - 只支持`Get`请求。
+  - 只支持`Get`请求。（请求`js`文件只能用Get）
 
 - 服务端代理：有跨域的请求操作时发送请求给后端，让后端帮你代为请求，然后最后将获取的结果发送给你。
 
@@ -338,7 +339,7 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 ## CDN
 
-内容分发网络，能够通过DNS查找离用户最近的CDN节点的IP，然后通过IP访问实际资源，如果CDN上没有缓存资源，就会到源站请求资源并缓存到CDN，这样用户下一次访问，就直接用CDN缓存的资源了。
+内容分发网络，能够通过DNS查找离用户最近的CDN节点的IP，然后通过IP访问实际资源，如果CDN上没有缓存资源，就会到源站请求资源并缓存到CDN，这样用户下一次访问，就直接用CDN缓存的资源了。`cache-control`设置为`public`（任何情况下都要缓存该资源），提升缓存量。
 
 ## DNS
 
@@ -355,7 +356,7 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 - TCP首部最小有20字节。
 - TCP只能是一对一通信。
 - TCP面向字节流通信。
-- TCP 使用滑动窗口机制来实现流量控制，通过动态改变窗口的大小进行拥塞控制。
+- TCP 使用滑动窗口机制来实现流量控制，通过动态改变拥塞窗口的大小进行拥塞控制。
 
 ### 三次握手
 
@@ -374,24 +375,17 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 ![四次挥手](https://imgconvert.csdnimg.cn/aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTcwNjA2MDg0ODUxMjcy?x-oss-process=image/format,png)
 
-### TCP滑动窗口
+### TCP流量控制
 
-发送方的发送缓存内的数据都可以被分为4类:
+防止发送端发的太快，耗尽接收方的资源，从而使接收方来不及处理。机制是丢包。用动态改变滑动窗口大小实现。
 
-- 已发送，已收到ACK
-- 已发送，未收到ACK
-- 未发送，但允许发送
-- 未发送，但不允许发送
+滑动窗口中的数据：已发送但还未收到确认；还未发送但等待发送。
 
-其中类型2和3都属于发送窗口。
+## TCP拥塞控制
 
-接收方的缓存数据分为3类：
+防止发送方发的太快，是网络来不及处理，从而导致网络拥塞。
 
-- 已接收
-- 未接收但准备接收
-- 未接收而且不准备接收
 
-其中类型2属于接收窗口。
 
 ### 与UDP的区别
 
@@ -800,11 +794,13 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 作用：
 
-- 在函数外部访问函数内部的变量.
+- 在函数外部访问函数内部的变量。
 
 - 让变量保存在内存中，不会随着函数的结束而销毁。
 
 缺点：会增大内存使用量，使用不当会造成内存泄漏。
+
+使用场景：防抖节流、回调（点击触发事件）
 
 *内存泄漏：已分配的内存未释放或者无法释放。比如：闭包和未清理的定时器。
 
@@ -813,12 +809,15 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 `js`垃圾回收器监视所有的对象，会把不可访问的对象删除。所谓的可访问就是可以从根访问到该值。
 
 - 标记清除：垃圾回收器获取根并标记它们，然后标记它们的引用以及子孙代的引用，没有被标记的就被删除。
+- 引用计数：记录每个对象被引用的次数，计数器为0就直接回收内存。无法处理相互引用的对象。
 
-- 引用计数：记录每个对象被引用的次数，计数器为0就直接回收内存。
+谷歌工具：performance里的JS Heap，呈上升趋势就有泄漏。
 
 ## Promise相关
 
 构造函数接收一个函数，这个函数有两个参数`resolve`和`reject`，它们都是函数，异步操作成功就调用`resolve`，出错就调用`reject`。
+
+Promise有自己的catch。
 
 Promise A+规则：
 
@@ -1133,9 +1132,11 @@ null == undefined返回true；
 
 - DOM0级：在元素上绑定事件，解绑时设置NULL。
 
-- DOM2级：通过事件监听的形式绑定，元素可以有多个事件处理函数，`addEventListener()`和`removeEventListener()`。有三个过程：事件捕获阶段、处于目标阶段、事件冒泡阶段。
+- DOM2级：通过事件监听的形式绑定，元素可以有多个事件处理函数，`addEventListener()`和`removeEventListener()`。有三个过程：事件捕获阶段、处于目标阶段、事件冒泡阶段。（默认是冒泡，阻止默认`preventDefault`行为不能阻止冒泡）
 
 *先冒泡后捕获：监听到捕获事件就推迟执行。
+
+*阻止冒泡和捕获：`stopPropagation()`。
 
 ## 模块化
 
@@ -1247,9 +1248,9 @@ function promiseAjax() {
 ## 生命周期
 
 1. VUE实例创建--->`beforeCreate`：做了一些初始化操作，此时组件还没有被挂载，data、methods等也没有绑定。
-2. `beforeCreate`--->`created`：完成了数据的绑定、计算属性和方法的挂载等，此时组件还没有挂载，但可以操作data和methods等。
+2. `beforeCreate`--->`created`：完成了数据的绑定、计算属性和方法的挂载等，此时组件还没有挂载，但可以操作data和methods等。（请求数据）
 3. `created`--->`beforeMount`：完成了页面模板的解析，页面存在内存中，还没有被渲染。
-4. `beforeMount`-->`mounted`： 执行页面从内存中渲染到DOM的操作，渲染页面模板的优先级是render函数>template属性>外部html。
+4. `beforeMount`-->`mounted`： 执行页面从内存中渲染到DOM的操作，渲染页面模板的优先级是render函数>template属性>外部html。（操作DOM，监听事件，获取元素属性）
 5. `mounted`-->`beforeUpdate`：数据更新时调用，此时，VUE实例中的数据是最新的，但页面上还是旧的数据。
 6. `beforeUpdate`-->`updated`：DOM渲染完成后调用，此时组件的DOM已经更新，可以执行依赖于DOM的操作。
 7. `updated`-->`beforeDestory`：实例销毁前调用，实例任然可以用。
@@ -1325,3 +1326,113 @@ $route可以访问当前路由的状态信息，而$router是一个实例，管�
   ![img](https://images2018.cnblogs.com/blog/998023/201805/998023-20180519211809225-1140464542.png)
 
   四种匹配方式，如果都不匹配就会看key值，如果有key值就根据key值操作。（使用key值可以更高效地更新虚拟DOM，index会改变）
+
+## VUE模板编译原理
+
+1. 将模板字符串循环解析转换成AST。
+2. 对AST进行静态节点标记，用来做虚拟DOM的渲染优化。
+3. 用AST生成render函数代码字符串。
+
+## v-model原理
+
+语法糖，用于表单数据的双向绑定，做了两个操作：
+
+1.  v-bind绑定一个value属性
+2. v-on指令给当前元素绑定input事件
+
+# 操作系统
+
+## 进程与线程
+
+- 进程：操作系统进行资源分配调度的单位。程序运行的载体。进程之间是独立的。
+- 线程：进程的一个实体，是CPU调度分配的基本单位。（程序的运行依靠进程，进程的实际执行单元就是线程）
+- 一个程序至少有一个进程，一个进程至少有一个线程，资源分配给进程，同一个进程下所有线程共享该进程的资源。
+
+## 死锁
+
+死锁是指两个或两个以上的进程在执行过程中，由于竞争资源或者由于彼此通信而造成的一种阻塞的现象，若无外力作用，它们都将无法推进下去。
+
+产生的条件：
+
+- 互斥条件：一个资源每次只能被一个线程使用；
+- 请求与保持条件：一个线程因请求资源而阻塞时，对已获得的资源保持不放；
+- 不剥夺条件：线程已获得的资源，在末使用完之前，不能强行剥夺；
+- 循环等待条件：若干线程之间形成一种头尾相接的循环等待资源关系；
+
+# 编译系统
+
+1. 五个阶段：词法分析、语法分析、语义分析与中间代码生成、优化和目标代码生成（依赖于目标机）。
+2. 文法：0型文法、1型文法（上下文有关）、2型文法（上下文无关）和3型文法（正规文法）。
+3. 词法分析：确定的有穷自动机DFA和不确定的有穷自动机（NFA）。
+4. 语法分析：自顶向下和自底向上。
+
+# 数据结构
+
+1. 数组：连续存储，下标访问元素，大小固定，只能存储一种数据类型。
+2. 栈：栈顶操作，先进后出。空间由操作系统自动分配释放。
+3. 队列：队头删除，队尾插入，先进先出。
+4. 链表：非连续非顺序的存储结构，无需初始化容量，可以任意加减元素，占用空间大。
+5. 树：二叉树、红黑树、B+树等。
+6. 堆：由程序员分配释放，可以被看成一棵完全二叉树，可分为大顶堆和小顶堆。
+7. 图：由节点的有穷集合和边的集合组成，无向图和有向图。
+
+# 设计模式
+
+## 观察者模式（发布订阅）
+
+观察者模式建立了一种对象与对象之间的依赖关系，一个对象发生改变时将自动通知其他对象，其他对象将相应做出反应。所以发生改变的对象称为观察目标，而被通知的对象称为观察者，一个观察目标可以对应多个观察者，而且这些观察者之间没有相互联系，可以根据需要增加和删除观察者，使得系统更易于扩展。
+
+```
+function Subject() {
+	this.observers = {};
+	this.on = function(observer,handler) {
+		for(var key in onservers) {
+			if(key === observer) {
+				this.observers[key].push(handler);
+			}
+		}
+	}
+	this.off = function(observer,handler) {
+		for(var key in this.observers) {
+			if(key === observer) {
+				for(var i = 0; i < this.observers[key].length;i++) {
+					if(this.observers[key][i] === handler) {
+						this.observers[key].splice(i,1);
+					}
+				}
+			}
+		}
+	}
+	this.fire = function(observer) {
+		for(var key in this.observers) {
+			if(key === observer) {
+				this.observers[key].forEach(handler => handler.apply(this));
+			}
+		}
+	}
+}
+```
+
+## 单例模式
+
+单例模式确保某一个类只有一个实例，而且自行实例化并向整个系统提供这个实例。
+
+```
+var SingleTon = function(){
+    var instance;
+    class CreateSingleTon {
+        constructor (name) {
+            if(instance) return instance;
+            this.name = name;
+            this.getName();
+            return instance = this;
+        }
+
+        getName() {
+            return this.name;
+        }
+    }
+    return CreateSingleTon;
+}();
+```
+
