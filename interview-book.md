@@ -314,7 +314,7 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 - CORS
   - 简单请求：请求中有`origin`头部，其中包含请求页面的源信息，服务器根据这个头部信息来决定是否响应，如果服务器认为这个请求可以接受就在`Access-Control-Allow-Origin`头部中会发相同的源信息，如果源信息不匹配就驳回请求。
   - 非简单请求：发送真正的请求前会发送一个`Preflight`请求给服务器，该请求使用OPTIONS方法，发送`Origin`、`Access-Control-Request-Method`头部，然后服务器决定是否允许这种类型的请求，通过在响应中发送头部与浏览器沟通，一旦服务器通过`Preflight`请求允许该请求后，浏览器就可以正常的CORS请求了。
-  - 当Access-Control-Allow-Credentials的值为true时可以携带cookie。
+  - 当`Access-Control-Allow-Credentials`的值为true时可以携带cookie。
   
 - JSONP
   - `js`不受浏览器同源策略的影响，可以通过`script`标签进行跨域请求。
@@ -322,7 +322,7 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 - 服务端代理：有跨域的请求操作时发送请求给后端，让后端帮你代为请求，然后最后将获取的结果发送给你。
 
-## 前端性能优化
+## 前端性能优化（白屏问题）
 
 1. 降低请求量：合并CSS、JS和图片（精灵图）。
 2. 使用缓存：http缓存（浏览器缓存）。
@@ -384,8 +384,6 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 ## TCP拥塞控制
 
 防止发送方发的太快，是网络来不及处理，从而导致网络拥塞。
-
-
 
 ### 与UDP的区别
 
@@ -773,8 +771,9 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 ## 数组常用方法
 
-| push    | 在末尾插入元素，返回数组长度，修改原数组                     |
+| 方法    | 含义                                                         |
 | ------- | ------------------------------------------------------------ |
+| push    | 在末尾插入元素，返回数组长度，修改原数组                     |
 | pop     | 删除末尾元素，返回被删除的元素，修改原数组                   |
 | shift   | 删除头部元素，返回被删除的元素，修改原数组                   |
 | unshift | 在头部插入元素，返回数组长度，修改原数组                     |
@@ -1050,13 +1049,11 @@ function throttle(fn, delay) {
 都可以用来改变this指向。
 
 - call有多个参数，第一个参数是this要指向的对象，以后的参数是数组里的元素。
-
 - apply有两个参数，第一个参数是this要指向的对象，第二个参数为数组。
-
 - bind会返回一个新的函数，还需要调用一次。
 
 ```
-  Function.prototype.bind2 = function (context) {
+  Function.prototype.Mybind = function (context) {
     var self = this;
     var args = Array.prototype.slice.call(arguments, 1);
     var fNOP = function () { };
@@ -1300,7 +1297,7 @@ Getter:根据state的值计算返回值
 
 Mutation:同步更改state
 
-Action:异步更改state
+Action:提交的是mutation，异步更改state
 
 ## vue-router相关
 
@@ -1340,6 +1337,10 @@ $route可以访问当前路由的状态信息，而$router是一个实例，管�
 1.  v-bind绑定一个value属性
 2. v-on指令给当前元素绑定input事件
 
+# webpack
+
+## 过程
+
 # 操作系统
 
 ## 进程与线程
@@ -1378,7 +1379,7 @@ $route可以访问当前路由的状态信息，而$router是一个实例，管�
 
 # 设计模式
 
-## 观察者模式（发布订阅）
+## 观察者模式
 
 观察者模式建立了一种对象与对象之间的依赖关系，一个对象发生改变时将自动通知其他对象，其他对象将相应做出反应。所以发生改变的对象称为观察目标，而被通知的对象称为观察者，一个观察目标可以对应多个观察者，而且这些观察者之间没有相互联系，可以根据需要增加和删除观察者，使得系统更易于扩展。
 
@@ -1412,6 +1413,55 @@ function Subject() {
 	}
 }
 ```
+
+## 发布订阅模式（存在调度中心）
+
+```
+
+
+var pubsub = {};
+(function(myObject) {
+    var topics = {};
+    var subUid = -1;
+    myObject.publish = function( topic, args ) {
+        if ( !topics[topic] ) {
+            return false;
+        }
+        var subscribers = topics[topic],
+            len = subscribers ? subscribers.length : 0;
+        while (len--) {
+            subscribers[len].func( topic, args );
+        }
+        return this;
+    };
+    myObject.subscribe = function( topic, func ) {
+        if (!topics[topic]) {
+            topics[topic] = [];
+        }
+        var token = ( ++subUid ).toString();
+        topics[topic].push({
+            token: token,
+            func: func
+        });
+        return token;
+    };
+    myObject.unsubscribe = function( token ) {
+        for ( var m in topics ) {
+            if ( topics[m] ) {
+                for ( var i = 0, j = topics[m].length; i < j; i++ ) {
+                    if ( topics[m][i].token === token ) {
+                        topics[m].splice( i, 1 );
+                        return token;
+                    }
+                }
+            }
+        }
+        return this;
+    };
+}( pubsub ));
+```
+
+
 
 ## 单例模式
 
