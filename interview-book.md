@@ -82,7 +82,7 @@ ctx.stroke();
 
 - `http`是明文传输，而`https`是有着`ssl`加密传输协议的。
 - `http`的端口是80，而`https`的端口是443。
-- `https`需要`ssl`证书，费用比较昂贵,而`http`不需要。
+- `https`需要`ssl`证书，费用比较昂贵，而`http`不需要。
 
 ## HTTP1.0、HTTP1.1、HTTP2.0的特点
 
@@ -267,6 +267,7 @@ HTTPS使用非对称加密传输对称密钥，使用对称密钥传输数据。
 - expires：过期时间。
 - path：路径，相同路径的页面可以共享cookie。
 - domain：主机名。
+- HttpOnly：过js脚本将无法读取到cookie信息,
 
 ### Session Storage
 
@@ -285,7 +286,7 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 *两个同源页面交互可以使用`localStorage`，不同源的话就两个页面嵌入相同的`iframe`实现交互。
 
-## XSS攻击
+## XSS攻击(跨站脚本攻击)
 
 页面被注入恶意脚本，使之在用户浏览器上运行，利用这些脚本获取用户敏感信息从而危害数据安全。
 
@@ -297,7 +298,7 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 防御：cookie设置`httponly`和secure；进行特殊字符过滤；对用户的输入进行检查。
 
-## CSRF攻击
+## CSRF攻击（跨站请求伪造）
 
 可以理解为攻击者盗用了用户的身份，以用户的名义发送了恶意请求。
 
@@ -315,7 +316,7 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
   - 简单请求：请求中有`origin`头部，其中包含请求页面的源信息，服务器根据这个头部信息来决定是否响应，如果服务器认为这个请求可以接受就在`Access-Control-Allow-Origin`头部中会发相同的源信息，如果源信息不匹配就驳回请求。
   - 非简单请求：发送真正的请求前会发送一个`Preflight`请求给服务器，该请求使用OPTIONS方法，发送`Origin`、`Access-Control-Request-Method`头部，然后服务器决定是否允许这种类型的请求，通过在响应中发送头部与浏览器沟通，一旦服务器通过`Preflight`请求允许该请求后，浏览器就可以正常的CORS请求了。
   - 当`Access-Control-Allow-Credentials`的值为true时可以携带cookie。
-  
+
 - JSONP
   - `js`不受浏览器同源策略的影响，可以通过`script`标签进行跨域请求。
   - 只支持`Get`请求。（请求`js`文件只能用Get）
@@ -360,7 +361,7 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 ### 三次握手
 
-1. 第一次握手：建立连接。客户端发送连接请求报文段，将`SYN`位置为1，`seq`随机的为x；然后，客户端进入`SYN_SEND`状态，等待服务器端的确认。服务器端由`SYN=1`知道，客户端请求建立连接；
+1. 第一次握手：建立连接。客户端发送连接请求报文段，将`SYN`位置为1，`seq`随机的为x；然后，客户端进入`SYN_SENT`状态，等待服务器端的确认。服务器端由`SYN=1`知道，客户端请求建立连接；
 2. 第二次握手：服务器端收到`SYN`报文段，需要确认联机信息，设置`ack`为x+1(客户端的`seq+1`)；同时，自己还要发送`SYN`请求信息，将`SYN`位置为1，`seq`再随机为y；此时服务器进入`SYN_RECV`状态；
 3. 第三次握手：客户端收到后检查`ack`是否正确。即第一次发送的`seq+1`,以及位码`ack`是否为1，若正确，客户端会再发送`ack`=(服务器的`seq`+1),`ack=1`，服务器收到后确认`seq`值与`ack=1`，则连接建立成功。客户端和服务器端都进入ESTABLISHED状态，完成TCP三次握手。
 
@@ -416,16 +417,16 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 | flex-wrap       | 决定是否换行                                                 |
 | justify-content | 决定项目在主轴上的对齐方式                                   |
 | align-items     | 决定项目在交叉轴上的对齐方式                                 |
-| flex-grow       | 定义项目的放大比例，默认为0                                  |
+| flex-grow       | 定义项目的放大比例，默认为0，都为1的话就等分空间             |
 | flex-shrink     | 定义项目的缩小比例，默认为1                                  |
 | flex-basis      | 定义在分配多余空间前，项目占据的主轴空间                     |
 | flex            | flex-grow,flex-shrink和flex-basis的简写，默认值为0 1 auto,flex:1的意思是flex:1 1 任意数字+任意长度单位 |
 
 ## 三栏布局
 
-- flex布局实现
+- flex布局实现（等分就都设置flex:1）
 
-```
+```html
 <body>
   <div class="box">
     <div class="left">left</div>
@@ -458,7 +459,7 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 - float布局实现
 
-```
+```html
 <body>
   <div class="box">
     <div class="left">left</div>
@@ -490,7 +491,7 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 - 绝对定位实现
 
-```
+```html
 <body>
   <div class="box">
     <div class="left">left</div>
@@ -527,7 +528,7 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 - margin和padding正负抵消
 
-```
+```html
 <body>
   <div class="box">
     <div class="left"></div>
@@ -560,7 +561,7 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 - flex布局实现
 
-```
+```html
 <body>
   <div class="box">
     <div class="left"></div>
@@ -587,8 +588,29 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 - border实现
 
-```
-<body>  <div class="box">    <div class="left"></div>    <div class="right"></div>  </div></body><style>  .box {    border-left: 100px solid #149BDF;  }  .left {    width: 100px;    height: 200px;    float: left;    margin-left: -100px;  }  .right {    width: 200px;    height: 400px;    margin-left: 150px;    background: #32CD32;  }</style>
+```html
+<body>  	
+    <div class="box">    		
+        <div class="left"></div>    		
+        <div class="right"></div>  	
+    </div>
+</body>
+<style>  
+    .box {    	
+        border-left: 100px solid #149BDF;  	
+    }  
+    .left {    	
+        width: 100px;    	
+        height: 200px;    	
+        float: left;    	
+        margin-left: -100px;  	
+    }  
+    .right {    	
+        width: 200px;    	
+        height: 400px;    	
+        margin-left: 150px;    	
+        background: #32CD32;  	
+    }
 ```
 
 ## 盒模型
@@ -646,34 +668,33 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 - flex实现
 
-```
-<body>
-  <div class="box">
-    <div class="content">content</div>
-  </div>
+```html
+<body>  
+	<div class="box">    
+		<div class="content">content</div>  
+	</div>
 </body>
 
-<style>
-  .box {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100px;
-    height: 100px;
-    background-color: green;
-  }
-
-  .content {
-    width: 50px;
-    height: 50px;
-    background-color: red;
-  }
+<style>  
+	.box {    
+		display: flex;    
+		justify-content: center;    
+		align-items: center;    
+		width: 100px;    
+		height: 100px;    
+		background-color: green;  
+	}  
+	.content {    
+		width: 50px;    
+		height: 50px;    
+		background-color: red;  
+	}
 </style>
 ```
 
 - `margin:auto`实现
 
-```
+```html
 <body>
   <div class="box">
     <div class="content">content</div>
@@ -703,7 +724,7 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 - 负margin法
 
-```
+```html
 <body>
   <div class="box">
     <div class="content">content</div>
@@ -757,7 +778,7 @@ BOM对象window，以键值对的形式存在，存储类型是String类型，�
 
 ## CSS实现三角形
 
-```
+```css
 	margin-top: 100px;
     width: 0;
     height: 0;
@@ -834,7 +855,7 @@ Promise A+规则：
 
 代码实现：
 
-```
+```js
   function mypromise(constructor) {
     self = this;
     self.value;
@@ -873,14 +894,14 @@ Promise A+规则：
   }
 ```
 
-```
+```js
   function promiseAll(list) {
     var finishedVal = new Array(list.length);
     var count = 0;
     return new Promise((resolve, reject) => {
       for (var i = 0; i < list.length; i++) {
         //不是promise对象,就用promise.resolve转成promise对象
-        Promise.resolve(list[i].then((val) => {
+        Promise.resolve(list[i]).then((val) => {
           finishedVal[i] = val;
           count++;
           if (count === list.length) {
@@ -888,21 +909,21 @@ Promise A+规则：
           }
         }, function (err) {
           return reject(err);
-        }))
+        })
       }
     })
   }
 ```
 
-```
+```js
 function promiseRace(list) {
     return new Promise((resolve, reject) => {
       for (var i = 0; i < list.length; i++) {
-        Promise.resolve(list[i].then((val) => {
+        Promise.resolve(list[i]).then((val) => {
           return resolve(val);
         }, function (err) {
           return reject(err);
-        }))
+        })
       }
     })
   }
@@ -924,13 +945,21 @@ function promiseRace(list) {
 
 ## 事件循环
 
-`js`先执行宏任务，再执行全部的微任务，然后继续新的宏任务。
+`js`先执行宏任务，再执行这个宏任务产生的全部的微任务，然后继续新的宏任务。
 
 - 宏任务：`script`(整体代码), `setTimeout`, `setInterval`, `setImmediate`, `I/O`, `UI rendering`。
 
 - 微任务：`process.nextTick`, `Promises`, `Object.observe`等。
 
 ## 原型链
+
+null是原型链的顶端。
+
+Function既是函数也是对象。
+
+Function-- > Function.prototype---- > Object.prototype---- > null
+
+Object--->Function.prototype---->Object.prototype----->null
 
 ![image-20210527162029450](C:\Users\akash\AppData\Roaming\Typora\typora-user-images\image-20210527162029450.png)
 
@@ -941,7 +970,7 @@ function promiseRace(list) {
   特点：基于原型链，既是父类的实例，又是子类的实例。
   缺点：无法实现多继承，无法向父类构造参数传参。
 
-```
+```js
 function Parent() {
   this.name = 'parent';
 }
@@ -956,12 +985,12 @@ Child.prototype = new Parent();
   特点：可以实现多继承。
   缺点：只能继承父类的实例属性和方法，不能继承原型上的属性和方法。
 
-```
+```js
 function Parent() {
   this.name = 'parent';
 }
 function Child() {
-  Parent1.call(this);
+  Parent.call(this);
   this.type = 'child';
 }
 ```
@@ -971,7 +1000,7 @@ function Child() {
   特点：可以继承实例属性和方法，也可以继承原型属性和方法。
   缺点：调用两次父类构造函数，会生成两份实例。
 
-```
+```js
 function Parent() {
   this.name = 'parent';
 }
@@ -989,7 +1018,7 @@ Child.prototype = new Parent();
 3. 将this指向新对象；
 4. 返回这个对象。
 
-```
+```js
 function myNew(fn) {
 	var obj = new Object();
 	obj._proto_ = fn.prototype;
@@ -1009,7 +1038,7 @@ function myNew(fn) {
 
 - 防抖：事件触发n秒后再调用函数，如果n秒内再次触发事件，就重新计时。（搜索框搜索输入）
 
-```
+```js
 function debounce(fn, delay) {
     var timer;
     return function () {
@@ -1027,7 +1056,7 @@ function debounce(fn, delay) {
 
 节流：每隔n秒就执行一次函数，中途触发不会执行函数。（滚动加载）
 
-```
+```js
 function throttle(fn, delay) {
     var timer;
     return function () {
@@ -1052,7 +1081,7 @@ function throttle(fn, delay) {
 - apply有两个参数，第一个参数是this要指向的对象，第二个参数为数组。
 - bind会返回一个新的函数，还需要调用一次。
 
-```
+```js
   Function.prototype.Mybind = function (context) {
     var self = this;
     var args = Array.prototype.slice.call(arguments, 1);
@@ -1081,7 +1110,7 @@ function throttle(fn, delay) {
 
 ## 数据类型
 
-- 基本数据类型：string、number、boolean、null、undefined和symbol。
+- 基本数据类型：string、number、boolean、null、undefined和symbol（唯一标识符）。
 - 引用类型：object、array和function。
 
 区别：
@@ -1107,7 +1136,7 @@ null == undefined返回true；
 - `Array.isArray()`方法。
 - `InstanceOf Array`方法。
 
-```
+```js
  function myInstanceOf(target1, target2) {
     // let proto = Object.getPrototypeOf(target1);
     // if (proto === target2.prototype) {
@@ -1147,7 +1176,7 @@ null == undefined返回true；
 
 如果B复制了A，当修改A时，看B是否会发生变化，如果B也跟着变了，说明这是浅拷贝，如果B没变，那就是深拷贝。浅拷贝是拷贝一层，深层次的对象级别的就拷贝引用；深拷贝是拷贝多层，每一级别的数据都会拷贝出来。
 
-```
+```js
 function deepClone(target) {
 	let result
 	if (typeof target === 'object') {
@@ -1212,7 +1241,7 @@ function deepClone(target) {
 
 创建对象、设置请求函数和回调函数、获取异步对象的`readyState`属性、判断响应报文的状态、读取响应数据。
 
-```
+```js
   var xmlhttp = new XMLHttpRequest();
   xmlhttp.open("GET", "/try/ajax/demo_get.php", true);
   xmlhttp.send();
@@ -1223,7 +1252,7 @@ function deepClone(target) {
   }
 ```
 
-```
+```js
 function promiseAjax() {
     return new Promise((resolve,reject) => {
       var xmlhttp = new XMLHttpRequest();
@@ -1245,7 +1274,7 @@ function promiseAjax() {
 ## 生命周期
 
 1. VUE实例创建--->`beforeCreate`：做了一些初始化操作，此时组件还没有被挂载，data、methods等也没有绑定。
-2. `beforeCreate`--->`created`：完成了数据的绑定、计算属性和方法的挂载等，此时组件还没有挂载，但可以操作data和methods等。（请求数据）
+2. `beforeCreate`--->`created`：完成了数据的绑定、计算属性和方法的挂载等，此时组件还没有挂载，但可以操作data和methods等。（ajax请求数据）
 3. `created`--->`beforeMount`：完成了页面模板的解析，页面存在内存中，还没有被渲染。
 4. `beforeMount`-->`mounted`： 执行页面从内存中渲染到DOM的操作，渲染页面模板的优先级是render函数>template属性>外部html。（操作DOM，监听事件，获取元素属性）
 5. `mounted`-->`beforeUpdate`：数据更新时调用，此时，VUE实例中的数据是最新的，但页面上还是旧的数据。
@@ -1334,12 +1363,8 @@ $route可以访问当前路由的状态信息，而$router是一个实例，管�
 
 语法糖，用于表单数据的双向绑定，做了两个操作：
 
-1.  v-bind绑定一个value属性
-2. v-on指令给当前元素绑定input事件
-
-# webpack
-
-## 过程
+1.  v-bind绑定一个value属性（简写：）
+2.  v-on指令给当前元素绑定input事件（简写@）
 
 # 操作系统
 
@@ -1377,13 +1402,119 @@ $route可以访问当前路由的状态信息，而$router是一个实例，管�
 6. 堆：由程序员分配释放，可以被看成一棵完全二叉树，可分为大顶堆和小顶堆。
 7. 图：由节点的有穷集合和边的集合组成，无向图和有向图。
 
+# 排序算法
+
+## 冒泡排序 `n^2`
+
+两两交换
+
+```js
+function bubbleSort(arr) {
+    var len = arr.length;
+    for (var i = 0; i < len; i++) {
+        for (var j = 0; j < len - 1 - i; j++) {
+            if (arr[j] > arr[j+1]) {        //相邻元素两两对比
+                var temp = arr[j+1];        //元素交换
+                arr[j+1] = arr[j];
+                arr[j] = temp;
+            }
+        }
+    }
+    return arr;
+}
+```
+
+## 插入排序 `n^2`
+
+从后往前插入
+
+```js
+function insertionSort(arr) {
+    var len = arr.length;
+    var preIndex, current;
+    for (var i = 1; i < len; i++) {
+        preIndex = i - 1;
+        current = arr[i];
+        while(preIndex >= 0 && arr[preIndex] > current) {
+            arr[preIndex+1] = arr[preIndex];
+            preIndex--;
+        }
+        arr[preIndex+1] = current;
+    }
+    return arr;
+}
+```
+
+## 快速排序 `nlogn`
+
+准备两个数组容器，遍历数组，逐个与基数比对，较小的放左边容器，较大的放右边容器。递归处理两个容器之中的数据。
+
+```js
+var sortArray = function(arr) {
+  if (arr.length <= 1) {
+    return arr;
+  }
+  var pivotIndex = Math.floor(arr.length / 2);
+  var pivot = arr.splice(pivotIndex, 1);
+  var left = [];
+  var right = [];
+
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i] < pivot) {
+      left.push(arr[i]);
+    } else {
+      right.push(arr[i]);
+    }
+  }
+  return sortArray(left).concat([pivot], sortArray(right));
+};
+```
+
+## 归并排序 `nlogn`
+
+分治思想。
+
+```js
+function mergeSort(arr) {  //采用自上而下的递归方法
+    var len = arr.length;
+    if(len < 2) {
+        return arr;
+    }
+    var middle = Math.floor(len / 2),
+        left = arr.slice(0, middle),
+        right = arr.slice(middle);
+    return merge(mergeSort(left), mergeSort(right));
+}
+
+function merge(left, right)
+{
+    var result = [];
+
+    while (left.length && right.length) {
+        if (left[0] <= right[0]) {
+            result.push(left.shift());
+        } else {
+            result.push(right.shift());
+        }
+    }
+
+    while (left.length)
+        result.push(left.shift());
+
+    while (right.length)
+        result.push(right.shift());
+
+    return result;
+}
+```
+
 # 设计模式
 
 ## 观察者模式
 
 观察者模式建立了一种对象与对象之间的依赖关系，一个对象发生改变时将自动通知其他对象，其他对象将相应做出反应。所以发生改变的对象称为观察目标，而被通知的对象称为观察者，一个观察目标可以对应多个观察者，而且这些观察者之间没有相互联系，可以根据需要增加和删除观察者，使得系统更易于扩展。
 
-```
+```js
 function Subject() {
 	this.observers = {};
 	this.on = function(observer,handler) {
@@ -1416,8 +1547,7 @@ function Subject() {
 
 ## 发布订阅模式（存在调度中心）
 
-```
-
+```js
 
 var pubsub = {};
 (function(myObject) {
@@ -1461,13 +1591,11 @@ var pubsub = {};
 }( pubsub ));
 ```
 
-
-
 ## 单例模式
 
 单例模式确保某一个类只有一个实例，而且自行实例化并向整个系统提供这个实例。
 
-```
+```js
 var SingleTon = function(){
     var instance;
     class CreateSingleTon {
